@@ -2,16 +2,14 @@ package ec.org.cedia.smartinventory.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;          // ← NUEVO
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -36,4 +34,15 @@ public class Product {
     private Boolean active;
     @Column(name = "is_available")  // ← NUEVO
     private String isAvailable;
+
+    private Integer minimumStock;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "product_suppliers",
+        joinColumns = @JoinColumn(name = "product_id"),
+        inverseJoinColumns = @JoinColumn(name = "supplier_id")
+    )
+    @Builder.Default
+    private Set<Supplier> suppliers = new HashSet<>();
 }
