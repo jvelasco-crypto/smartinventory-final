@@ -21,7 +21,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(org.springframework.http.HttpMethod.GET,
-                    "/products", "/products/**", "/health", "/mcp").permitAll()
+                    "/products", "/products/**", "/health", "/mcp",
+                    "/reports/**", "/suppliers", "/suppliers/**").permitAll()
                 .requestMatchers(
                     "/mcp"
                 ).permitAll()
