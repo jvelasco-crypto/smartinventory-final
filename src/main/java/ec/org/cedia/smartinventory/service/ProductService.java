@@ -3,6 +3,7 @@ package ec.org.cedia.smartinventory.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import ec.org.cedia.smartinventory.dto.ProductRequestDTO;
 import ec.org.cedia.smartinventory.dto.ProductResponseDTO;
@@ -21,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductService implements ProductUseCase {
 
     private final ProductRepository productRepository;
+    private final PurchaseOrderService purchaseOrderService;
 
     /**
      * Crea un nuevo producto en el inventario.
@@ -54,6 +56,7 @@ public class ProductService implements ProductUseCase {
     }
 
     @Override
+    @Transactional
     public ProductResponseDTO actualizarProducto(Long id, ProductRequestDTO request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con id: " + id));
@@ -61,7 +64,16 @@ public class ProductService implements ProductUseCase {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
-        return toResponseDTO(productRepository.save(product));
+        Product saved = productRepository.save(product);
+
+        if (saved.getMinimumStock() != null && saved.getStock() != null
+                && saved.getStock() <= saved.getMinimumStock()) {
+            log.info("Stock ({}) ≤ minimumStock ({}) para producto id={} — disparando orden automática",
+                    saved.getStock(), saved.getMinimumStock(), saved.getId());
+            purchaseOrderService.createAutomaticIfNeeded(saved);
+        }
+
+        return toResponseDTO(saved);
     }
 
     @Override
