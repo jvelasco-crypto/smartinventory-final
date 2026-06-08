@@ -37,6 +37,7 @@ public class ProductService implements ProductUseCase {
                 .description(request.getDescription())
                 .price(request.getPrice())
                 .stock(request.getStock())
+                .minimumStock(request.getMinimumStock())
                 .active(true)
                 .build();
         return toResponseDTO(productRepository.save(product));
@@ -64,6 +65,7 @@ public class ProductService implements ProductUseCase {
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
         product.setStock(request.getStock());
+        product.setMinimumStock(request.getMinimumStock());
         Product saved = productRepository.save(product);
 
         if (saved.getMinimumStock() != null && saved.getStock() != null
@@ -92,6 +94,7 @@ public class ProductService implements ProductUseCase {
                 .price(product.getPrice())
                 .stock(product.getStock())
                 .active(product.getActive())
+                .minimumStock(product.getMinimumStock())
                 .build();
     }
 }

@@ -13,4 +13,5 @@ public class ProductResponseDTO {
     private Double price;
     private Integer stock;
     private Boolean active;
+    private Integer minimumStock;
 }
